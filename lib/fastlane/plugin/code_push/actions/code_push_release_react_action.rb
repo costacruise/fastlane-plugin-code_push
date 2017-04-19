@@ -2,21 +2,23 @@ module Fastlane
   module Actions
     class CodePushReleaseReactAction < Action
       def self.run(params)
-        command = "code-push release-react #{params[:app_name]} #{params[:platform]} -d #{params[:deployment]} "\
-          "--des \"#{params[:description]}\" "
-        if params[:mandatory]
-          command += "-m "
-        end
-        if params[:target_binary_version]
-          command += "-t #{params[:target_binary_version]} "
-        end
-        if params[:disabled]
-          command += "-x "
-        end
-        if params[:dry_run]
-          UI.message("Dry run!".red + " Would have run: " + command + "\n")
-        else
-          sh(command.to_s)
+        Dir.chdir params[:path] do
+          command = "code-push release-react #{params[:app_name]} #{params[:platform]} -d #{params[:deployment]} "\
+            "--des \"#{params[:description]}\" "
+          if params[:mandatory]
+            command += "-m "
+          end
+          if params[:target_binary_version]
+            command += "-t #{params[:target_binary_version]} "
+          end
+          if params[:disabled]
+            command += "-x "
+          end
+          if params[:dry_run]
+            UI.message("Dry run!".red + " Would have run: " + command + "\n")
+          else
+            sh(command.to_s)
+          end
         end
       end
 
@@ -76,7 +78,12 @@ module Fastlane
                                       is_string: false,
                                       default_value: false,
                                       optional: true,
-                                      description: "Specifies whether this release should be immediately downloadable")
+                                      description: "Specifies whether this release should be immediately downloadable"),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                      type: String,
+                                      optional: true,
+                                      default_value: ".",
+                                      description: "Relative Path for React Native Project"),
         ]
       end
 
